@@ -1,0 +1,139 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+APPCENTER_API_TOKEN = ENV['APPCENTER_API_TOKEN']
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Lane to add a new device to provisioning profiles
+If you want to add a new device run:
+
+```
+fastlane add_device
+```
+
+After the new device was added you can refresh your provisioning profile by running:
+```
+fastlane renew_profile
+```
+  "
+  lane :add_device do
+    device_name = prompt(text: 'Enter the device name: ')
+    device_udid = prompt(text: 'Enter the device UDID: ')
+    device_hash = {}
+    device_hash[device_name] = device_udid
+    register_devices(
+      devices: device_hash
+    )
+  end
+
+  # A helper lane for refreshing provisioning profiles.
+  lane :refresh_profiles do
+    match(app_identifier: 'com.nikorozo.ionic.test', type: 'adhoc', force_for_new_devices: true)
+  end
+  private_lane :remove_old_profiles do
+    sh('fastlane sigh manage -p "com.nikorozo.ionic.test" --force')
+  end
+
+  desc 'Builds a QA version of the application and distributes to HockeyApp'
+  lane :qa do
+    create_keychain(
+      name: "testKeychain",
+      default_keychain: true,
+      password: 'testPass',
+      unlock: true,
+      timeout: 3600,
+      lock_when_sleeps: true
+    )
+    # first remove old and expired provisioning profiles (workaround: https://github.com/fastlane/fastlane/issues/3738)
+    remove_old_profiles
+    match(app_identifier: 'com.nikorozo.ionic.test', type: 'adhoc', readonly: false, force: true, force_for_new_devices: true, keychain_name: 'testKeychain', keychain_password: 'testPass')
+    # match(app_identifier: 'com.nikorozo.ionic.test', type: 'adhoc', readonly: false, force: true, force_for_new_devices: true)
+    disable_automatic_code_signing(
+      path: 'ios/App/App.xcodeproj'
+    )
+    build_ios_app()
+
+    appcenter_upload(
+      api_token: APPCENTER_API_TOKEN,
+      owner_name: "NikoRozo",
+      app_name: "MyApp",
+      #ipa: ENV['CORDOVA_IOS_RELEASE_BUILD_PATH'],
+      release_notes: 'Please uninstall app before installing the new version.'
+    )
+  end
+
+  desc 'Builds and publishes production to AppStore'
+  lane :deploy do
+    remove_old_profiles
+    match(app_identifier: 'com.nikorozo.ionic.test', type: 'appstore', readonly: false, force: true, force_for_new_devices: true)
+    # ionic(
+    #   platform: 'ios',
+    #   type: 'appstore',
+    #   cordova_prepare: false
+    # )
+    deliver(
+      force: true,
+      skip_screenshots: true,
+      #ipa: ENV['CORDOVA_IOS_RELEASE_BUILD_PATH']
+    )
+  end
+
+  desc 'Creates the app in DevCenter and App Store Connect'
+  lane :create_app do
+    produce(
+      app_name: 'MyApp',
+      language: 'English'
+    )
+  end
+end
+
+platform :android do
+  desc 'Builds a QA version of the application and distributes to HockeyApp'
+  lane :qa do
+    
+    gradle(task: 'assemble', project_dir: 'android/')
+
+    appcenter_upload(
+      api_token: APPCENTER_API_TOKEN,
+      owner_name: "NikoRozo",
+      app_name: "MyApp",
+      release_notes: 'Please uninstall app before installing the new version.',
+      #apk: ENV['CORDOVA_ANDROID_RELEASE_BUILD_PATH']
+    )
+  end
+
+  desc 'Builds and signs a production release to distribute in Google Play Store'
+  lane :deploy do
+    # ionic(
+    #   platform: 'android',
+    #   release: true,
+    #   cordova_prepare: false
+    # )
+
+    supply(
+      json_key: 'google_play.json',
+      
+      # apk: './platforms/android/build/outputs/apk/release/android-release.apk',
+      apk: ENV['CORDOVA_ANDROID_RELEASE_BUILD_PATH'],
+      track: 'internal',
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      package_name: 'com.nikorozo.ionic.test'
+    )
+  end
+end

@@ -9,7 +9,9 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "deploy:android": "bundle exec fastlane android qa",
+    "deploy:ios": "bundle exec fastlane ios qa"
   },
   "private": true,
   "dependencies": {
