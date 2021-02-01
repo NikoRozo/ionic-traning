@@ -1,4 +1,4 @@
-app_identifier("com.itcraftship.ionic.test") # The bundle identifier of your app
+app_identifier("com.nikorozo.ionic.test") # The bundle identifier of your app
 apple_id("appdev@nursa.com") # Your Apple email address
 
 team_id("5RNJYN9BR8")  # Developer Portal Team ID

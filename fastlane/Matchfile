@@ -4,7 +4,7 @@ storage_mode("git")
 
 type("adhoc") # The default type, can be: appstore, adhoc, enterprise or development
 
-app_identifier(["com.itcraftship.ionic.test"])
+app_identifier(["com.nikorozo.ionic.test"])
 username "appdev@nursa.com" # Your Apple Developer Portal username
 
 # For all available options run `fastlane match --help`

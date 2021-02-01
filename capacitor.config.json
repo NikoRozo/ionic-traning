@@ -1,6 +1,6 @@
 {
-  "appId": "io.ionic.starter",
-  "appName": "1.myApp",
+  "appId": "com.nikorozo.ionic.test",
+  "appName": "myApp",
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "build",
