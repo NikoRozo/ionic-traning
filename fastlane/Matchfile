@@ -1,11 +1,11 @@
-git_url("git@bitbucket.org:teamnursa/nursa-certificates.git")
+# git_url("git@bitbucket.org:teamnursa/nursa-certificates.git")
 
 storage_mode("git")
 
 type("adhoc") # The default type, can be: appstore, adhoc, enterprise or development
 
 app_identifier(["com.nikorozo.ionic.test"])
-username "appdev@nursa.com" # Your Apple Developer Portal username
+username "NikoRozo" # Your Apple Developer Portal username
 
 # For all available options run `fastlane match --help`
 # Remove the # in the beginning of the line to enable the other options

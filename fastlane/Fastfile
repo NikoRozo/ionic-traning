@@ -50,17 +50,17 @@ fastlane renew_profile
 
   desc 'Builds a QA version of the application and distributes to HockeyApp'
   lane :qa do
-    create_keychain(
-      name: "testKeychain",
-      default_keychain: true,
-      password: 'testPass',
-      unlock: true,
-      timeout: 3600,
-      lock_when_sleeps: true
-    )
+    #create_keychain(
+    #  name: "testKeychain",
+    #  default_keychain: true,
+    #  password: 'testPass',
+    #  unlock: true,
+    #  timeout: 3600,
+    #  lock_when_sleeps: true
+    #)
     # first remove old and expired provisioning profiles (workaround: https://github.com/fastlane/fastlane/issues/3738)
     remove_old_profiles
-    match(app_identifier: 'com.nikorozo.ionic.test', type: 'adhoc', readonly: false, force: true, force_for_new_devices: true, keychain_name: 'testKeychain', keychain_password: 'testPass')
+    # match(app_identifier: 'com.nikorozo.ionic.test', type: 'adhoc', readonly: false, force: true, force_for_new_devices: true, keychain_name: 'testKeychain', keychain_password: 'testPass')
     # match(app_identifier: 'com.nikorozo.ionic.test', type: 'adhoc', readonly: false, force: true, force_for_new_devices: true)
     disable_automatic_code_signing(
       path: 'ios/App/App.xcodeproj'
